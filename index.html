@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Maabara Science Labs | Chemistry · Physics · Biology</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:            #0b0e14;
+      --surface:       #111520;
+      --surface2:      #161b28;
+      --border:        rgba(99,220,180,0.13);
+      --border-strong: rgba(99,220,180,0.28);
+      --accent:        #3dffc5;
+      --accent2:       #6ee7ff;
+      --accent-dim:    rgba(61,255,197,0.08);
+      --accent-dim2:   rgba(110,231,255,0.08);
+      --chem:          #3dffc5;
+      --chem-dim:      rgba(61,255,197,0.10);
+      --phys:          #f97316;
+      --phys-dim:      rgba(249,115,22,0.10);
+      --bio:           #34d399;
+      --bio-dim:       rgba(52,211,153,0.10);
+      --text:          #e4eaf5;
+      --text-muted:    #6a7a9b;
+      --text-dim:      #3d4d6b;
+      --radius:        10px;
+      --radius-sm:     6px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Century Gothic', 'CenturyGothic', 'Apple Gothic', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Grid BG */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(61,255,197,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(61,255,197,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none; z-index: 0;
+    }
+
+    /* Glow blob top-right */
+    body::after {
+      content: '';
+      position: fixed; top: -120px; right: -120px;
+      width: 520px; height: 520px;
+      background: radial-gradient(circle, rgba(61,255,197,0.06) 0%, transparent 70%);
+      pointer-events: none; z-index: 0;
+    }
+
+    /* ══════════════════════════════
+       NAVIGATION
+    ══════════════════════════════ */
+    .nav-header {
+      position: sticky; top: 0; z-index: 1000;
+      background: rgba(11,14,20,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+
+    .logo-area {
+      display: flex; align-items: center; gap: 12px;
+      cursor: pointer; text-decoration: none;
+    }
+
+    .logo-icon-wrap {
+      width: 38px; height: 38px;
+      background: var(--accent-dim);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .logo-icon-wrap i { color: var(--accent); font-size: 1.1rem; }
+
+    .logo-text h2 {
+      font-size: 1.25rem; font-weight: 800;
+      letter-spacing: -0.3px; color: var(--text);
+    }
+
+    .logo-text span {
+      display: block;
+      font-family: 'DM Mono', monospace;
+      font-size: 10px; letter-spacing: 0.1em;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .menu-toggle {
+      display: none;
+      background: transparent; border: 1px solid var(--border);
+      color: var(--text-muted); border-radius: var(--radius-sm);
+      width: 36px; height: 36px;
+      align-items: center; justify-content: center;
+      cursor: pointer; font-size: 1rem;
+      transition: all 0.2s;
+    }
+    .menu-toggle:hover { border-color: var(--border-strong); color: var(--accent); }
+
+    .nav-links {
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+      display: flex; align-items: center; gap: 7px;
+      padding: 7px 14px;
+      border-radius: var(--radius-sm);
+      border: 1px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .nav-links a:hover {
+      color: var(--text);
+      background: var(--accent-dim);
+      border-color: var(--border);
+    }
+
+    .nav-links a.active-link {
+      color: var(--accent);
+      background: var(--accent-dim);
+      border-color: var(--border-strong);
+    }
+
+    @media (max-width: 850px) {
+      .menu-toggle { display: flex; }
+      .nav-links {
+        display: none;
+        position: absolute; top: 64px; left: 0; right: 0;
+        background: rgba(11,14,20,0.98);
+        border-bottom: 1px solid var(--border);
+        flex-direction: column; gap: 0; padding: 0.8rem;
+      }
+      .nav-links.show { display: flex; }
+      .nav-links a { font-size: 12px; padding: 10px 14px; width: 100%; }
+    }
+
+    /* ══════════════════════════════
+       HERO SLIDER
+    ══════════════════════════════ */
+    .slider-container {
+      position: relative; z-index: 1;
+      max-width: 1300px; margin: 2rem auto;
+      padding: 0 1.5rem;
+    }
+
+    .slider-wrapper {
+      position: relative;
+      overflow: hidden;
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+
+    .slides { display: flex; transition: transform 0.6s cubic-bezier(.4,0,.2,1); }
+
+    .slide {
+      min-width: 100%; height: 360px;
+      background-size: cover; background-position: center;
+      display: flex; align-items: flex-end; padding: 2.5rem;
+      position: relative;
+    }
+
+    .slide::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(11,14,20,0.85) 0%, rgba(11,14,20,0.2) 60%, transparent 100%);
+    }
+
+    .slide-content {
+      position: relative; z-index: 2; color: white; max-width: 560px;
+    }
+
+    .slide-eyebrow {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 8px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .slide-eyebrow::before {
+      content: ''; width: 20px; height: 1px; background: var(--accent);
+    }
+
+    .slide-content h2 {
+      font-size: 2.4rem; font-weight: 800;
+      letter-spacing: -1px; margin-bottom: 0.5rem;
+      line-height: 1.05;
+    }
+
+    .slide-content p {
+      font-family: 'DM Mono', monospace;
+      font-size: 13px; color: rgba(228,234,245,0.7);
+      letter-spacing: 0.02em;
+    }
+
+    .slider-btn {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      background: rgba(11,14,20,0.7);
+      border: 1px solid var(--border-strong);
+      color: var(--text-muted);
+      width: 42px; height: 42px;
+      border-radius: 50%; cursor: pointer; z-index: 10;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.9rem; transition: all 0.2s;
+      backdrop-filter: blur(4px);
+    }
+    .slider-btn:hover { background: var(--accent); color: #0b0e14; border-color: var(--accent); }
+    .prev-btn { left: 18px; }
+    .next-btn { right: 18px; }
+
+    /* Slide dots */
+    .slide-dots {
+      position: absolute; bottom: 16px; right: 2.5rem;
+      display: flex; gap: 6px; z-index: 10;
+    }
+    .dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: rgba(228,234,245,0.3);
+      cursor: pointer; transition: all 0.2s;
+    }
+    .dot.active { background: var(--accent); width: 20px; border-radius: 99px; }
+
+    @media (max-width: 600px) {
+      .slide { height: 260px; }
+      .slide-content h2 { font-size: 1.7rem; }
+    }
+
+    /* ══════════════════════════════
+       MAIN CONTENT
+    ══════════════════════════════ */
+    .container {
+      position: relative; z-index: 1;
+      max-width: 1300px; margin: 0 auto; padding: 0 1.5rem 5rem;
+    }
+
+    .section-label {
+      display: flex; align-items: center; gap: 10px;
+      font-family: 'DM Mono', monospace; font-size: 11px;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--text-muted); margin-bottom: 1.5rem; margin-top: 2.5rem;
+    }
+    .section-label .dot-sm {
+      width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0;
+    }
+    .section-label .line {
+      flex: 1; height: 1px; background: var(--border);
+    }
+
+    /* Lab Cards */
+    .lab-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.2rem;
+    }
+
+    .lab-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 2rem 1.8rem;
+      transition: border-color 0.25s, transform 0.2s;
+      position: relative; overflow: hidden;
+    }
+    .lab-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: var(--card-accent, var(--accent));
+      opacity: 0; transition: opacity 0.25s;
+    }
+    .lab-card:hover { border-color: var(--border-strong); transform: translateY(-3px); }
+    .lab-card:hover::before { opacity: 1; }
+
+    .lab-card.chem { --card-accent: var(--chem); }
+    .lab-card.phys { --card-accent: var(--phys); }
+    .lab-card.bio  { --card-accent: var(--bio); }
+
+    .card-icon {
+      width: 48px; height: 48px;
+      border-radius: var(--radius);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem; margin-bottom: 1.2rem;
+      border: 1px solid;
+    }
+    .chem .card-icon { background: var(--chem-dim); border-color: rgba(61,255,197,0.25); color: var(--chem); }
+    .phys .card-icon { background: var(--phys-dim); border-color: rgba(249,115,22,0.25); color: var(--phys); }
+    .bio  .card-icon { background: var(--bio-dim);  border-color: rgba(52,211,153,0.25);  color: var(--bio); }
+
+    .lab-card h3 {
+      font-size: 1.25rem; font-weight: 700;
+      margin-bottom: 0.6rem; color: var(--text);
+    }
+
+    .lab-card p {
+      font-size: 13.5px; line-height: 1.65;
+      color: var(--text-muted); margin-bottom: 1.5rem;
+    }
+
+    .request-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+      padding: 9px 18px;
+      border-radius: var(--radius-sm);
+      border: 1px solid; cursor: pointer;
+      text-decoration: none; font-weight: 500;
+      transition: all 0.18s;
+    }
+    .chem .request-btn { color: var(--chem); border-color: rgba(61,255,197,0.3); background: var(--chem-dim); }
+    .phys .request-btn { color: var(--phys); border-color: rgba(249,115,22,0.3);  background: var(--phys-dim); }
+    .bio  .request-btn { color: var(--bio);  border-color: rgba(52,211,153,0.3);  background: var(--bio-dim); }
+
+    .chem .request-btn:hover { box-shadow: 0 0 14px rgba(61,255,197,0.2); }
+    .phys .request-btn:hover { box-shadow: 0 0 14px rgba(249,115,22,0.2); }
+    .bio  .request-btn:hover { box-shadow: 0 0 14px rgba(52,211,153,0.2); }
+
+    /* ══════════════════════════════
+       REQUEST SECTION
+    ══════════════════════════════ */
+    .request-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 2.2rem 2.5rem;
+    }
+
+    .request-panel p.intro {
+      font-size: 14px; line-height: 1.7; color: var(--text-muted);
+      margin-bottom: 2rem;
+    }
+
+    .form-links {
+      display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.8rem;
+    }
+
+    .form-link-btn {
+      display: inline-flex; align-items: center; gap: 9px;
+      font-family: 'DM Mono', monospace;
+      font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;
+      padding: 12px 22px; border-radius: var(--radius-sm);
+      border: 1px solid; text-decoration: none; font-weight: 500;
+      transition: all 0.18s;
+    }
+    .form-link-btn.chem { color: var(--chem); border-color: rgba(61,255,197,0.35); background: var(--chem-dim); }
+    .form-link-btn.phys { color: var(--phys); border-color: rgba(249,115,22,0.35);  background: var(--phys-dim); }
+    .form-link-btn.bio  { color: var(--bio);  border-color: rgba(52,211,153,0.35);  background: var(--bio-dim); }
+    .form-link-btn:hover { filter: brightness(1.12); transform: translateY(-1px); }
+
+    .info-note {
+      display: flex; align-items: center; gap: 8px;
+      font-family: 'DM Mono', monospace; font-size: 11px;
+      color: var(--text-muted); letter-spacing: 0.04em;
+      padding: 12px 16px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--surface2);
+    }
+    .info-note i { color: var(--accent2); }
+
+    /* ══════════════════════════════
+       ABOUT SECTION
+    ══════════════════════════════ */
+    .about-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+      gap: 1.2rem;
+    }
+
+    .about-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.8rem;
+      transition: border-color 0.2s;
+    }
+    .about-card:hover { border-color: var(--border-strong); }
+
+    .about-card h3 {
+      font-size: 1rem; font-weight: 700;
+      margin-bottom: 0.8rem; display: flex; align-items: center; gap: 9px;
+    }
+    .about-card h3 i { font-size: 0.95rem; }
+    .chem-text { color: var(--chem); }
+    .phys-text { color: var(--phys); }
+    .bio-text  { color: var(--bio); }
+
+    .about-card p {
+      font-size: 13px; line-height: 1.7; color: var(--text-muted);
+    }
+
+    .operating-hours {
+      margin-top: 1.5rem;
+      display: flex; align-items: center; gap: 10px;
+      font-family: 'DM Mono', monospace; font-size: 12px;
+      color: var(--text-muted);
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px 18px;
+    }
+    .operating-hours i { color: var(--accent2); }
+    .operating-hours strong { color: var(--text); }
+
+    .contact-section {
+      margin-top: 1.5rem;
+      display: flex; align-items: center; gap: 10px;
+      font-family: 'DM Mono', monospace; font-size: 12px;
+      color: var(--text-muted);
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px 18px;
+    }
+    .contact-section i { color: var(--accent2); }
+    .contact-section strong { color: var(--text); }
+
+    .contact-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 2rem 1.8rem;
+      transition: border-color 0.25s, transform 0.2s;
+      position: relative; overflow: hidden;
+    }
+
+    /* ══════════════════════════════
+       FOOTER
+    ══════════════════════════════ */
+    footer {
+      position: relative; z-index: 1;
+      border-top: 1px solid var(--border);
+      padding: 1.5rem 2rem;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px; letter-spacing: 0.06em;
+      color: var(--text-dim);
+    }
+
+    /* ══════════════════════════════
+       BADGE / PULSE
+    ══════════════════════════════ */
+    .badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-family: 'DM Mono', monospace; font-size: 10px;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      padding: 3px 10px; border-radius: 99px;
+      background: var(--accent-dim); border: 1px solid var(--border-strong);
+      color: var(--accent);
+    }
+    .badge::before {
+      content: ''; width: 6px; height: 6px; border-radius: 50%;
+      background: var(--accent); animation: pulse 2s infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<header class="nav-header">
+  <div class="logo-area" onclick="showSection('home')">
+    <div class="logo-icon-wrap"><i class="fas fa-flask"></i></div>
+    <div class="logo-text">
+      <h2>Maabara</h2>
+      <span>Chemistry · Physics · Biology</span>
+    </div>
+  </div>
+
+  <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+    <i class="fas fa-bars" id="menuIcon"></i>
+  </button>
+
+  <nav class="nav-links" id="navLinks">
+    <a href="#" class="active-link" id="homeLink" onclick="nav(event,'home')">
+      <i class="fas fa-home"></i> Home
+    </a>
+    <a href="#" id="labRequestLink" onclick="nav(event,'labRequest')">
+      <i class="fas fa-clipboard-list"></i> Lab Requests
+    </a>
+    <a href="#" id="aboutLink" onclick="nav(event,'about')">
+      <i class="fas fa-users"></i> About
+    </a>
+    <a href="#" id="contactLink" onclick="nav(event,'contactUs')">
+      <i class="fas fa-phone"></i> Contact Us
+    </a>
+  </nav>
+</header>
+
+<!-- SLIDER -->
+<section class="slider-container" id="sliderSection">
+  <div class="slider-wrapper">
+    <div class="slides" id="slides">
+      <div class="slide" style="background-image: url('beak (2).png'), linear-gradient(135deg,#0b1622,#111f2f); background-size: cover; background-position: center;">
+        <div class="slide-content">
+          <div class="slide-eyebrow">HisTech Maabara</div>
+          <h2>Chemistry Laboratory</h2>
+          <p>Precision analysis &amp; synthesis · Reagent management</p>
+        </div>
+      </div>
+      <div class="slide" style="background-image: url('Am-1920x1080.png'), linear-gradient(135deg,#120f1e,#1a1130); background-size: cover; background-position: center;">
+        <div class="slide-content">
+          <div class="slide-eyebrow" style="color:var(--phys);">HisTech Maabara</div>
+          <h2>Physics Laboratory</h2>
+          <p>Optics, mechanics &amp; electromagnetism</p>
+        </div>
+      </div>
+      <div class="slide" style="background-image: url('micro-1920x1080.png'), linear-gradient(135deg,#0b1a12,#0e2218); background-size: cover; background-position: center;">
+        <div class="slide-content">
+          <div class="slide-eyebrow" style="color:var(--bio);">HisTech Maabara</div>
+          <h2>Biology Laboratory</h2>
+          <p>Microscopy &amp; life sciences</p>
+        </div>
+      </div>
+      <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1532094349884-543bc11b234d?q=80&w=2070&auto=format&fit=crop'); background-size: cover; background-position: center;">
+        <div class="slide-content">
+          <div class="slide-eyebrow">HisTech Maabara</div>
+          <h2>Integrated Labs</h2>
+          <p>Research &amp; innovation hub</p>
+        </div>
+      </div>
+    </div>
+    <button class="slider-btn prev-btn" id="prevBtn"><i class="fas fa-chevron-left"></i></button>
+    <button class="slider-btn next-btn" id="nextBtn"><i class="fas fa-chevron-right"></i></button>
+    <div class="slide-dots" id="slideDots"></div>
+  </div>
+</section>
+
+<!-- MAIN -->
+<main class="container">
+
+  <!-- HOME SECTION -->
+  <div id="homeSection">
+    <div class="section-label">
+      <div class="dot-sm"></div>
+      Our Laboratories
+      <div class="line"></div>
+      <span class="badge">3 Active Labs</span>
+    </div>
+
+    <div class="lab-grid">
+      <div class="lab-card chem">
+        <div class="card-icon"><i class="fas fa-atom"></i></div>
+        <h3>Chemistry Lab</h3>
+        <p>Equipped with fume hoods, conical flasks, and titration setups. Ideal for dry reagents and chemical solutions.</p>
+        <a href="#" class="request-btn" onclick="nav(event,'labRequest')">
+          <i class="fas fa-flask"></i> Request Equipment / Chemical
+        </a>
+      </div>
+
+      <div class="lab-card phys">
+        <div class="card-icon"><i class="fas fa-bolt"></i></div>
+        <h3>Physics Lab</h3>
+        <p>Optics instruments, galvanometers and resistance boxes. Explore mechanics, thermodynamics, and current electricity.</p>
+        <a href="#" class="request-btn" onclick="nav(event,'labRequest')">
+          <i class="fas fa-cogs"></i> Request Equipment
+        </a>
+      </div>
+
+      <div class="lab-card bio">
+        <div class="card-icon"><i class="fas fa-dna"></i></div>
+        <h3>Biology Lab</h3>
+        <p>Food test solutions, specimen trays, and fluorescence microscopes. Classification of living organisms and preservative solutions.</p>
+        <a href="#" class="request-btn" onclick="nav(event,'labRequest')">
+          <i class="fas fa-seedling"></i> Request Equipment / Chemical
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- LAB REQUEST SECTION -->
+  <div id="labRequestSection" style="display:none;">
+    <div class="section-label">
+      <div class="dot-sm"></div>
+      Laboratory Requests
+      <div class="line"></div>
+    </div>
+
+    <div class="request-panel">
+      <p class="intro">Use the forms below to request equipment or chemicals for each laboratory. All requests are processed within 24 hours. Please include item names, quantities, and any relevant specifications.</p>
+
+      <div class="form-links">
+        <a href="reagent-request-system (1).html" target="_blank" class="form-link-btn chem">
+          <i class="fas fa-flask"></i> Chemistry Request Form
+        </a>
+        <a href="reagent-request-system (1).html" target="_blank" class="form-link-btn phys">
+          <i class="fas fa-atom"></i> Physics Request Form
+        </a>
+        <a href="reagent-request-system (1).html" target="_blank" class="form-link-btn bio">
+          <i class="fas fa-dna"></i> Biology Request Form
+        </a>
+      </div>
+
+      <div class="info-note">
+        <i class="fas fa-info-circle"></i>
+        Please specify equipment/chemical details clearly when you submit your request.
+      </div>
+    </div>
+  </div>
+
+  <!-- ABOUT SECTION -->
+  <div id="aboutSection" style="display:none;">
+    <div class="section-label">
+      <div class="dot-sm"></div>
+      About Our Laboratories
+      <div class="line"></div>
+    </div>
+
+    <div class="about-grid">
+      <div class="about-card">
+        <h3><i class="fas fa-atom chem-text"></i> <span class="chem-text">Chemistry Laboratory</span></h3>
+        <p>A chemistry laboratory is a specialized workspace equipped with scientific instruments and chemical reagents. It is used to conduct controlled experiments, analyze substances, and research chemical properties and reactions.</p>
+      </div>
+      <div class="about-card">
+        <h3><i class="fas fa-bolt phys-text"></i> <span class="phys-text">Physics Laboratory</span></h3>
+        <p>A physics laboratory is a dedicated workspace for practical experimentation, observation, and measurement of physical phenomena. It allows students, researchers, and scientists to test theories on matter, energy, forces, and motion in a controlled environment.</p>
+      </div>
+      <div class="about-card">
+        <h3><i class="fas fa-dna bio-text"></i> <span class="bio-text">Biology Laboratory</span></h3>
+        <p>A biology laboratory is a specialized workspace equipped with scientific instruments where biological research, experiments, and analyses are conducted. It bridges theoretical life science concepts with practical applications, enabling study of living organisms and cellular processes.</p>
+      </div>
+    </div>
+
+    <div class="operating-hours">
+      <i class="fas fa-clock"></i>
+      <span><strong>Operating Hours:</strong> Monday – Friday &nbsp;|&nbsp; 08:00 – 18:00 &nbsp;|&nbsp; Safety training required for all users.</span>
+    </div>
+  </div>
+
+  <!-- Contact Us SECTION -->
+  <div id="contactSection" style="display:none;">
+   <div class="contact-card">
+     <div class="contact-section">
+       <a href="https://wa.me/+255765778304" style="font-size:80px; text-decoration:none;"><i class="fab fa-whatsapp"></i></a>
+       <span><strong>Whatsapp</strong> -Please click the icon to contact us </span>
+      </div>
+     <div class="contact-section">
+       <a href="tel:+255765778304" style="font-size:80px; text-decoration:none;"><i class="fas fa-phone"></i></a>
+       <span><strong>Phone Call</strong> -Please click the icon to contact us </span>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>© 2026 HisTech – Chemistry, Physics &amp; Biology Laboratories &nbsp;·&nbsp; Safety First</footer>
+
+<script>
+(function() {
+  /* ── SLIDER ── */
+  const slidesEl   = document.getElementById('slides');
+  const slideItems = document.querySelectorAll('.slide');
+  const dotsEl     = document.getElementById('slideDots');
+  const total      = slideItems.length;
+  let   current    = 0, timer;
+
+  // Build dots
+  slideItems.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.onclick = () => goTo(i);
+    dotsEl.appendChild(d);
+  });
+
+  function updateDots() {
+    dotsEl.querySelectorAll('.dot').forEach((d, i) => {
+      d.className = 'dot' + (i === current ? ' active' : '');
+    });
+  }
+
+  function goTo(n) {
+    current = (n + total) % total;
+    slidesEl.style.transform = `translateX(-${current * 100}%)`;
+    updateDots();
+  }
+
+  function startAuto() { timer = setInterval(() => goTo(current + 1), 5000); }
+  function resetAuto()  { clearInterval(timer); startAuto(); }
+
+  document.getElementById('nextBtn').onclick = () => { goTo(current + 1); resetAuto(); };
+  document.getElementById('prevBtn').onclick = () => { goTo(current - 1); resetAuto(); };
+  startAuto();
+
+  /* ── NAV ── */
+  const menuToggle = document.getElementById('menuToggle');
+  const navLinks   = document.getElementById('navLinks');
+  const menuIcon   = document.getElementById('menuIcon');
+
+  menuToggle.addEventListener('click', e => {
+    e.stopPropagation();
+    navLinks.classList.toggle('show');
+    menuIcon.className = navLinks.classList.contains('show') ? 'fas fa-times' : 'fas fa-bars';
+  });
+
+  document.addEventListener('click', () => {
+    if (navLinks.classList.contains('show')) {
+      navLinks.classList.remove('show');
+      menuIcon.className = 'fas fa-bars';
+    }
+  });
+
+  const sections = {
+    home:       document.getElementById('homeSection'),
+    labRequest: document.getElementById('labRequestSection'),
+    about:      document.getElementById('aboutSection'),
+    contactUs:  document.getElementById('contactSection'),
+  };
+  const links = {
+    home:       document.getElementById('homeLink'),
+    labRequest: document.getElementById('labRequestLink'),
+    about:      document.getElementById('aboutLink'),
+  };
+
+  window.showSection = function(key) {
+    Object.values(sections).forEach(s => s.style.display = 'none');
+    Object.values(links).forEach(l => l.classList.remove('active-link'));
+    if (sections[key]) sections[key].style.display = 'block';
+    if (links[key])    links[key].classList.add('active-link');
+    navLinks.classList.remove('show');
+    menuIcon.className = 'fas fa-bars';
+  };
+
+  window.nav = function(e, key) {
+    e.preventDefault();
+    showSection(key);
+  };
+
+  showSection('home');
+
+  // Logo goes home
+  document.querySelector('.logo-area').addEventListener('click', () => showSection('home'));
+})();
+</script>
+</body>
+</html>
